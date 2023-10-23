@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+<h2>DETAIL</h2>
+  <h3>{{ movie.pk }} 번째 글</h3>
+  <hr>
+  <p>작성자 : {{ movie.user }}</p>
+  <p>제목: {{ movie.title }}</p>
+  <p>내용: {{ movie.content }}</p>
+  <p>작성 시각: {{ movie.created_at }}</p>
+  <p>수정 시각: {{ movie.updated_at }}</p>
+  <p>장르: {{ movie.get_genre_display }}</p>
+  <p>평점: {{ movie.rating }}</p>
+  <span>좋아요: {{ movie.like_users.count }}개</span>
+  <form action="{% url "movies:likes" movie.pk%}" method="POST">
+    {% csrf_token %}
+    {% if request.user in movie.like_users.all %}
+      <input type="submit" class="btn btn-primary" value="좋아요 취소">
+    {% else %}
+      <input type="submit" class="btn btn-danger" value="좋아요">
+    {% endif %}
+  </form>
+  <hr>
+  {% if request.user == movie.user %}
+    <a href="{% url "movies:update" movie.pk %}" class="btn btn-outline-primary">UPDATE</a>
+    <form action="{% url "movies:delete" movie.pk %}" method="POST">
+      {% csrf_token %}
+      <input type="submit" class="btn btn-outline-danger" value="삭제">
+    </form>
+  {% endif %}
+  <hr>
+  <h4>댓글 목록</h4>
+  <ul>
+    {% for comment in comments %}
+      <div>
+        {{ comment.user }} - {{ comment.content }}
+        
+        {% if request.user == comment.user %}
+          <form action="{% url "movies:comments_delete" movie.pk comment.pk %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-outline-info" value="삭제">
+          </form>
+        {% endif %}
+      </div>
+      <br>
+      {% for recomment in comment.recomment_set.all %}
+    <div class="card" style="width:50rem;">
+      {{ recomment.user }} - {{ recomment.content }}
+      {% if request.user == recomment.user %}
+        <form action="{% url "movies:recomments_delete" movie.pk comment.pk recomment.pk %}" method="POST">
+          {% csrf_token %}
+          <input type="submit" class="btn btn-outline-primary" value="삭제">
+        </form>
+      {% endif %}
+    </div>
+    <br>
+    {% endfor %}
+      <form action="{% url "movies:create_recomments" movie.pk comment.pk %}" method="POST">
+        {% csrf_token %}
+        {{ recomment_form }}
+        <input type="submit" class="btn btn-light">
+      </form>
+    
+    {% endfor %}
+
+
+
+  </ul>
+  <hr>
+  <br>
+  <form action="{% url "movies:comments_create" movie.pk %}" method="POST">
+    {% csrf_token %}
+    {{ comment_form }}
+    <input type="submit" class="btn btn-light">
+  </form>
+
+
+
+  <hr>
+  <a href="{% url "movies:index" %}" class="btn btn-secondary">BACK</a>
+</div>
+  {% endblock content %}

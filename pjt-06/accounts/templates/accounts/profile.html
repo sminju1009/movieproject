@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+  <h1>{{ person.username }}의 프로필</h1>
+  <br>
+    <div class="btn-group">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      팔로잉: {{ person.followings.all|length }}
+      </button>
+      <ul class="dropdown-menu">
+        {% for person in person.followings.all %}
+        <li><a class="dropdown-item" href="{% url "accounts:profile" person.username %}">{{ person.username }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      팔로워: {{ person.followers.all|length }}
+      </button>
+      <ul class="dropdown-menu">
+        {% for person in person.followers.all %}
+        <li><a class="dropdown-item" href="{% url "accounts:profile" person.username %}">{{ person.username }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <br>
+    <div>
+
+    {% if request.user == person %}
+    <button type="button" class="btn btn-dark">자신을 팔로우할 수 없습니다.</button>
+    {% elif reqeust.user != person %}
+      <form action="{% url "accounts:follow" person.pk%}"method ="POST">
+        {% csrf_token %}
+        {% if request.user in person.followers.all %}
+          <input type="submit" class="btn btn-danger" value="UNFOLLOW">
+        {% else %}
+          <input type="submit" class="btn btn-primary" value="FOLLOW">
+        {% endif %}
+      </form>
+    {% endif %}
+    </div>
+
+  <br>
+  <hr>
+  <br>
+  <h2>{{ person.username }}의 게시글 수: {{ person.movie_set.all|length }}</h2>
+  <div class="list-group">
+    {% for movie in person.movie_set.all %}
+      <a href="{% url "movies:detail" movie.pk %}" class="list-group-item list-group-item-action">{{ movie.title }}</a>
+    {% endfor %}
+  </div>
+<br>
+  <hr>
+  <br>
+
+  <h2>{{ person.username }}의 댓글 수: {{ person.comment_set.all|length }}</h2>
+  <div class="list-group">
+    {% for comment in person.comment_set.all %}
+      <a href="{% url "movies:detail" comment.pk %}" class="list-group-item list-group-item-action">{{ comment.content }}</a>
+    {% endfor %}
+  </div>
+
+<br>
+  <hr>
+  <br>
+  <h2>{{ person.username }}님이 좋아요를 누른 게시글 수: {{ person.like_movies.all|length }}</h2>
+  <div class="list-group">
+    {% for movie in person.like_movies.all %}
+      <a href="{% url "movies:detail" movie.pk %}" class="list-group-item list-group-item-action">{{ movie.title }}</a>
+    {% endfor %}
+  </div>
+  <br>
+  <hr>
+  <br>
+  <h2>{{ person.username }}님이 작성한 대댓글 수: {{ person.recomment_set.all|length }}</h2>
+  <div class="list-group">
+    {% for recomment in person.recomment_set.all %}
+      <a href="{% url "movies:detail" recomment.pk %}" class="list-group-item list-group-item-action">{{ recomment.content }}</a>
+    {% endfor %}
+  </div>
+<br>
+<br>
+<br>
+  <a href="{% url "movies:index" %}"><button type="button" class="btn btn-dark">Back</button></a>
+{% endblock content %}

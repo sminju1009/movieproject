@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1><p class="text-center"><br>INDEX PAGE</p></h1>
+{% if request.user.is_authenticated %}
+<a href="{% url 'movies:create' %}"><button type="button" class="btn btn-primary">CREATE</button></a>
+{% else %}
+<a href="{% url 'accounts:login' %}"><button type="button" class="btn btn-dark">LOGIN</button></a>
+{% endif %}
+<hr>
+ <div class="container">
+  <div class="row">
+  {% for movie in movies %}
+  <div class="card " style="width: 18rem;">
+    <img src="https://upload.wikimedia.org/wikipedia/ko/thumb/4/45/%ED%95%B4%EB%A6%AC_%ED%8F%AC%ED%84%B0%EC%99%80_%ED%98%BC%ED%98%88_%EC%99%95%EC%9E%90_%EC%98%81%ED%99%94.jpg/220px-%ED%95%B4%EB%A6%AC_%ED%8F%AC%ED%84%B0%EC%99%80_%ED%98%BC%ED%98%88_%EC%99%95%EC%9E%90_%EC%98%81%ED%99%94.jpg" class="card-img-top" alt="...">
+    <div class="card-body">
+    <h5 class="card-title">{{ movie.pk }} {{ movie.title }}</h5>
+      
+  <p class="card-text">{{ movie.content|slice:":100" }}...</p>
+  <p>작성자: <a href="{% url "accounts:profile" movie.user.username %}">{{ movie.user }}</a></p>
+  <a href="{% url "movies:detail" movie.pk %}"><button type="button" class="btn btn-primary">Detail</button></a>
+    </div>
+  </div>
+{% endfor %}
+
+</div>
+
+{% endblock content %}
